@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaRegEdit, FaRegTrashAlt } from "react-icons/fa";
 import { GoPlus } from "react-icons/go";
 import AddMemberModal from "../../components/ui/TeamMembers/AddMemberModal";
@@ -8,20 +8,23 @@ const mockMembers = [
     id: 1,
     name: "Micheal Mia",
     designation: "Founder & CEO",
-    image: "https://images.unsplash.com/photo-1531123897727-8f129e1bfa8ea?q=80&w=800&auto=format&fit=crop"
+    image:
+      "https://images.unsplash.com/photo-1531123897727-8f129e1bfa8ea?q=80&w=800&auto=format&fit=crop",
   },
   {
     id: 2,
     name: "Thomas Keller",
     designation: "Lead Service Advisor",
-    image: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?q=80&w=800&auto=format&fit=crop"
+    image:
+      "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?q=80&w=800&auto=format&fit=crop",
   },
   {
     id: 3,
     name: "Flexible Rental Plans", // Keeping the exact text from screenshot 3rd card
     designation: "Sales Director",
-    image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=800&auto=format&fit=crop"
-  }
+    image:
+      "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=800&auto=format&fit=crop",
+  },
 ];
 
 const TeamMembers = () => {
@@ -71,17 +74,17 @@ const TeamMembers = () => {
       <div className="flex-1">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {mockMembers.map((member) => (
-            <div 
-              key={member.id} 
+            <div
+              key={member.id}
               className="relative w-full h-[450px] rounded-[24px] overflow-hidden group shadow-[0_8px_30px_rgb(0,0,0,0.08)]"
             >
               {/* Background Image */}
-              <img 
-                src={member.image} 
-                alt={member.name} 
+              <img
+                src={member.image}
+                alt={member.name}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
-              
+
               {/* Gradient Overlay for Text */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
 
@@ -109,9 +112,9 @@ const TeamMembers = () => {
         </div>
       </div>
 
-      <AddMemberModal 
-        open={isAddModalOpen} 
-        onCancel={() => setIsAddModalOpen(false)} 
+      <AddMemberModal
+        open={isAddModalOpen}
+        onCancel={() => setIsAddModalOpen(false)}
         onSubmit={(values) => {
           console.log(values);
           setIsAddModalOpen(false);

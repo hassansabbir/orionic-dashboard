@@ -1,24 +1,13 @@
 import { FaRegBell } from "react-icons/fa6";
 import { Badge } from "antd";
-import { useFetchAdminProfileQuery } from "../../redux/apiSlices/authSlice";
+import { useNavigate, Link } from "react-router-dom";
+import { useProfileQuery } from "../../redux/apiSlices/authSlice";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import SearchBar from "../../components/SearchBar";
-
-interface UserData {
-  name?: string;
-  role?: string;
-  profileImg?: string;
-}
-
-interface AdminProfileResponse {
-  data?: UserData;
-}
+import getImageUrl from "@/components/ui/getImageUrl";
 
 const Header = () => {
-  const { data: userData, isLoading } = useFetchAdminProfileQuery() as {
-    data?: AdminProfileResponse;
-    isLoading: boolean;
-  };
+  const { data: userData, isLoading } = useProfileQuery();
 
   if (isLoading) {
     return <div className="h-16 flex items-center px-6">Loading...</div>;
@@ -48,19 +37,32 @@ const Header = () => {
         </div>
 
         {/* User Profile */}
-        <div className="flex items-center gap-3">
+        <Link
+          to="/personal-information"
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+        >
           <div className="text-right hidden sm:block">
             <p className="text-sm font-bold text-gray-900 leading-none mb-1">
-              {userData?.data?.name || "Admin"}
+              {userData?.name || "Super Admin"}
             </p>
             <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">
-              {userData?.data?.role || "DIVINE"}
+              {userData?.role || "ADMIN"}
             </p>
           </div>
-          <div className="h-10 w-10 rounded-lg bg-black flex items-center justify-center text-white font-bold text-lg shadow-md">
-            {userData?.data?.name?.charAt(0) || "D"}
+          <div className="h-10 w-10 rounded-lg bg-black flex items-center justify-center overflow-hidden shadow-md">
+            {userData?.image ? (
+              <img
+                src={getImageUrl(userData.image)}
+                alt={userData.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-white font-bold text-lg">
+                {userData?.name?.charAt(0) || "S"}
+              </span>
+            )}
           </div>
-        </div>
+        </Link>
       </div>
     </div>
   );

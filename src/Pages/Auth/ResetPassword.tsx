@@ -18,7 +18,7 @@ interface ApiResponse {
 
 const ResetPassword = () => {
   const location = useLocation();
-  const email = new URLSearchParams(location.search).get("email");
+  const token = new URLSearchParams(location.search).get("token");
   const navigate = useNavigate();
   const [resetPassword] = useResetPasswordMutation();
   const [showSuccess, setShowSuccess] = useState(false);
@@ -26,16 +26,17 @@ const ResetPassword = () => {
   const onFinish = async (values: ResetPasswordFormValues): Promise<void> => {
     try {
       const response = (await resetPassword({
-        email,
-        ...values,
+        token: token || "",
+        data: values,
       }).unwrap()) as ApiResponse;
+      
       if (response?.success) {
         setShowSuccess(true);
       } else {
         toast.error(response?.message || "Failed to update password.");
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || "An error occurred.");
+      toast.error(typeof error === 'string' ? error : "An error occurred.");
     }
   };
 

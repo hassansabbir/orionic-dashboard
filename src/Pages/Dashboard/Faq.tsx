@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaRegEdit, FaRegTrashAlt } from "react-icons/fa";
 import { GoPlus } from "react-icons/go";
 import AddFaqModal from "../../components/ui/FAQ/AddFaqModal";

@@ -12,9 +12,12 @@ interface LoginFormValues {
 }
 
 interface LoginResponse {
-  data?: {
+  success: boolean;
+  message: string;
+  data: {
     accessToken: string;
     refreshToken: string;
+    role: string;
   };
 }
 
@@ -26,22 +29,28 @@ const Login = () => {
   const onFinish = async (values: LoginFormValues): Promise<void> => {
     try {
       const response = (await login(values).unwrap()) as LoginResponse;
-      const { accessToken, refreshToken } = response?.data || {};
+      
+      if (response?.success) {
+        const { accessToken, refreshToken } = response.data;
 
-      if (rememberMe) {
-        localStorage.setItem("authToken", accessToken || "");
-        localStorage.setItem("refreshToken", refreshToken || "");
-        Cookies.set("refreshToken", refreshToken || "");
+        if (rememberMe) {
+          localStorage.setItem("authToken", accessToken);
+          localStorage.setItem("refreshToken", refreshToken);
+          Cookies.set("refreshToken", refreshToken);
+        } else {
+          sessionStorage.setItem("authToken", accessToken);
+          sessionStorage.setItem("refreshToken", refreshToken);
+          Cookies.set("refreshToken", refreshToken);
+        }
+
+        toast.success(response.message || "Login successful!");
+        navigate("/");
       } else {
-        sessionStorage.setItem("authToken", accessToken || "");
-        sessionStorage.setItem("refreshToken", refreshToken || "");
-        Cookies.set("refreshToken", refreshToken || "");
+        toast.error(response?.message || "Login failed");
       }
-
-      navigate("/");
-      toast.success("Login successful!");
     } catch (error: any) {
-      toast.error(error?.data?.message || "An error occurred");
+      // The error is now the message string due to transformErrorResponse
+      toast.error(typeof error === 'string' ? error : "An error occurred");
     }
   };
 

@@ -38,7 +38,7 @@ const authSlice = api.injectEndpoints({
       query: (data) => {
         return {
           method: "POST",
-          url: "auth/verify-email",
+          url: "/auth/verify-account",
           body: data,
         };
       },
@@ -47,7 +47,7 @@ const authSlice = api.injectEndpoints({
       query: (data) => {
         return {
           method: "POST",
-          url: "/auth/login",
+          url: "/auth/admin-login",
           body: data,
         };
       },
@@ -64,20 +64,17 @@ const authSlice = api.injectEndpoints({
       query: (data) => {
         return {
           method: "POST",
-          url: "auth/forget-password",
+          url: "/auth/forget-password",
           body: data,
         };
       },
     }),
-    resetPassword: builder.mutation<any, ResetPasswordData>({
-      query: (data) => {
+    resetPassword: builder.mutation<any, { token: string; data: ResetPasswordData }>({
+      query: ({ token, data }) => {
         return {
           method: "POST",
-          url: "/auth/reset-password",
+          url: `/auth/reset-password?token=${token}`,
           body: data,
-          headers: {
-            Authorization: localStorage.getItem("Authorization") || "",
-          },
         };
       },
     }),
@@ -93,51 +90,27 @@ const authSlice = api.injectEndpoints({
       invalidatesTags: ["AdminData"],
     }),
 
-    updateProfile: builder.mutation<any, UpdateProfileData>({
-      query: (data) => {
-        const token = localStorage.getItem("token");
-        return {
-          method: "POST",
-          url: "/auth/update-profile",
-          body: data,
-          headers: {
-            Authorization: token ? `Bearer ${JSON.parse(token)}` : "",
-          },
-        };
-      },
-      invalidatesTags: ["AdminData"],
-    }),
-    updateAdminProfile: builder.mutation<any, UpdateProfileData>({
-      query: (data) => {
-        const token = localStorage.getItem("token");
-        return {
-          method: "PATCH",
-          url: "/admin/profile",
-          body: data,
-          headers: {
-            Authorization: token ? `Bearer ${JSON.parse(token)}` : "",
-          },
-        };
-      },
-      invalidatesTags: ["AdminData"],
-    }),
-
     profile: builder.query<any, void>({
       query: () => {
-        const token = localStorage.getItem("token");
         return {
           method: "GET",
-          url: "/auth/get-profile",
-          headers: {
-            Authorization: token ? `Bearer ${JSON.parse(token)}` : "",
-          },
+          url: "/user/me",
         };
       },
       providesTags: ["AdminData"],
-
-      transformResponse: ({ user }: { user: any }) => {
-        return user;
+      transformResponse: (response: any) => {
+        return response.data;
       },
+    }),
+    updateProfile: builder.mutation<any, any>({
+      query: (data) => {
+        return {
+          method: "PATCH",
+          url: "/user/profile",
+          body: data,
+        };
+      },
+      invalidatesTags: ["AdminData"],
     }),
     fetchAdminProfile: builder.query<any, void>({
       query: () => {
@@ -158,6 +131,5 @@ export const {
   useChangePasswordMutation,
   useUpdateProfileMutation,
   useProfileQuery,
-  useUpdateAdminProfileMutation,
   useFetchAdminProfileQuery,
 } = authSlice;

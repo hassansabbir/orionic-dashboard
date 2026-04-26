@@ -24,12 +24,13 @@ const ForgotPassword = () => {
       }).unwrap()) as ApiResponse;
 
       if (response?.success) {
+        toast.success(response?.message || "OTP sent successfully");
         navigate(`/auth/verify-otp?email=${values.email}`);
       } else {
         toast.error(response?.message || "Failed to send reset link");
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || "An error occurred");
+      toast.error(typeof error === 'string' ? error : "An error occurred");
     }
   };
 

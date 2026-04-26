@@ -1,49 +1,26 @@
 import { useState } from "react";
+import { Popconfirm } from "antd";
 import { CiEdit, CiTrash } from "react-icons/ci";
 import { HiPlus } from "react-icons/hi";
 import CarModal from "./CarModal";
+import {
+  useGetAllCarsQuery,
+  useDeleteCarMutation,
+  useAddCarMutation,
+  useUpdateCarMutation,
+} from "@/redux/apiSlices/carSlice";
+import getImageUrl from "@/components/ui/getImageUrl";
+import toast from "react-hot-toast";
 
 const CarManagementSection = () => {
-  const [activeTab, setActiveTab] = useState("Car Rental Web");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const [selectedCar, setSelectedCar] = useState<any>(null);
 
-  const [cars, setCars] = useState([
-    {
-      id: 1,
-      name: "Tesla Model 3",
-      description: "Experience the future of driving with this premium electric sedan.",
-      seats: 5,
-      transmission: "Automatic",
-      fuel: "Electric",
-      year: 2024,
-      range: "358 miles",
-      image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&q=80&w=400",
-    },
-    {
-      id: 2,
-      name: "Tesla Model 3",
-      description: "Experience the future of driving with this premium electric sedan.",
-      seats: 5,
-      transmission: "Automatic",
-      fuel: "Electric",
-      year: 2024,
-      range: "358 miles",
-      image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=400",
-    },
-    {
-      id: 3,
-      name: "Tesla Model 3",
-      description: "Experience the future of driving with this premium electric sedan.",
-      seats: 5,
-      transmission: "Automatic",
-      fuel: "Electric",
-      year: 2024,
-      range: "358 miles",
-      image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=400",
-    },
-  ]);
+  const { data: carData, isLoading } = useGetAllCarsQuery();
+  const [deleteCar] = useDeleteCarMutation();
+  const [addCar, { isLoading: isAdding }] = useAddCarMutation();
+  const [updateCar, { isLoading: isUpdating }] = useUpdateCarMutation();
 
   const handleAddCar = () => {
     setModalMode("add");
@@ -57,41 +34,44 @@ const CarManagementSection = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteCar = (id: number) => {
-    setCars(cars.filter(car => car.id !== id));
+  const handleDeleteCar = async (id: string) => {
+    try {
+      await deleteCar(id).unwrap();
+      toast.success("Car deleted successfully");
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to delete car");
+    }
   };
 
-  const handleModalSubmit = (values: any) => {
-    console.log("Form values:", values);
-    setIsModalOpen(false);
-    // Implementation for add/edit logic would go here
+  const handleModalSubmit = async (formData: FormData) => {
+    try {
+      if (modalMode === "add") {
+        await addCar(formData).unwrap();
+        toast.success("Car added successfully");
+      } else {
+        await updateCar({ id: selectedCar._id, data: formData }).unwrap();
+        toast.success("Car updated successfully");
+      }
+      setIsModalOpen(false);
+    } catch (error: any) {
+      toast.error(error?.data?.message || `Failed to ${modalMode} car`);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="py-10 text-center text-gray-500">Loading cars...</div>
+    );
+  }
 
   return (
     <div className="space-y-8">
-      {/* Tabs */}
-      <div className="flex justify-center">
-        <div className="bg-gray-100/50 p-1 rounded-xl flex gap-1">
-          {["Car Rental Web", "Parent Web"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-8 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                activeTab === tab
-                  ? "bg-white text-black shadow-sm"
-                  : "text-gray-500 hover:text-black"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Header Actions */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Manage Car Description</h1>
-        <button 
+        <h1 className="text-2xl font-bold text-gray-900">
+          Manage Car Description
+        </h1>
+        <button
           onClick={handleAddCar}
           className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors shadow-lg shadow-black/10"
         >
@@ -102,52 +82,111 @@ const CarManagementSection = () => {
 
       {/* Car Cards List */}
       <div className="space-y-4">
-        {cars.map((car) => (
+        {carData?.data?.map((car: any) => (
           <div
-            key={car.id}
-            className="bg-white p-6 rounded-2xl flex gap-8 items-center shadow-sm border border-gray-50 hover:shadow-md transition-shadow duration-200 group"
+            key={car._id}
+            className="bg-white p-6 rounded-2xl flex flex-col md:flex-row gap-8 items-center shadow-sm border border-gray-50 hover:shadow-md transition-shadow duration-200 group"
           >
             {/* Car Image */}
-            <div className="w-48 h-32 rounded-xl overflow-hidden flex-shrink-0">
+            <div className="w-full md:w-64 h-40 rounded-xl overflow-hidden flex-shrink-0">
               <img
-                src={car.image}
+                src={getImageUrl(car.images?.[0])}
                 alt={car.name}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
             </div>
 
             {/* Car Details */}
-            <div className="flex-1 space-y-4">
+            <div className="flex-1 space-y-4 w-full">
               <div className="flex justify-between items-start">
-                <h3 className="text-xl font-bold text-gray-900">{car.name}</h3>
+                <div>
+                  <div className="flex items-center gap-3 mb-1">
+                    <h3 className="text-xl font-bold text-gray-900">
+                      {car.name}
+                    </h3>
+                    <span className="px-2.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-bold uppercase rounded-full">
+                      {car.brand}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-500 max-w-2xl line-clamp-2">
+                    {car.description}
+                  </p>
+                </div>
                 <div className="flex gap-2">
-                  <button 
+                  <button
                     onClick={() => handleEditCar(car)}
                     className="p-2 text-gray-400 hover:text-blue-500 transition-colors"
                   >
                     <CiEdit size={24} />
                   </button>
-                  <button 
-                    onClick={() => handleDeleteCar(car.id)}
-                    className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                  <Popconfirm
+                    title="Delete the car"
+                    description="Are you sure to delete this car?"
+                    onConfirm={() => handleDeleteCar(car._id)}
+                    okText="Yes"
+                    cancelText="No"
+                    okButtonProps={{ className: "bg-black" }}
                   >
-                    <CiTrash size={24} />
-                  </button>
+                    <button className="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                      <CiTrash size={24} />
+                    </button>
+                  </Popconfirm>
                 </div>
               </div>
 
-              <p className="text-sm text-gray-500 max-w-2xl">{car.description}</p>
-
-              <div className="flex flex-wrap gap-x-6 gap-y-2 text-[13px] text-gray-400">
-                <p>Seats: <span className="text-gray-700 font-semibold">{car.seats}</span></p>
-                <p>Transmission: <span className="text-gray-700 font-semibold">{car.transmission}</span></p>
-                <p>Fuel: <span className="text-gray-700 font-semibold">{car.fuel}</span></p>
-                <p>Year: <span className="text-gray-700 font-semibold">{car.year}</span></p>
-                <p>Range: <span className="text-gray-700 font-semibold">{car.range}</span></p>
+              <div className="flex flex-wrap gap-x-8 gap-y-3 pt-2 border-t border-gray-50 mt-4">
+                <div className="space-y-1">
+                  <p className="text-[11px] text-gray-400 uppercase tracking-wider font-bold">
+                    Seats
+                  </p>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {car.seats}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[11px] text-gray-400 uppercase tracking-wider font-bold">
+                    Transmission
+                  </p>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {car.transmission}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[11px] text-gray-400 uppercase tracking-wider font-bold">
+                    Fuel
+                  </p>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {car.fuelType}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[11px] text-gray-400 uppercase tracking-wider font-bold">
+                    Hourly Rate
+                  </p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    ${car.perHour}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[11px] text-gray-400 uppercase tracking-wider font-bold">
+                    Daily Rate
+                  </p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    ${car.perDay}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         ))}
+
+        {carData?.data?.length === 0 && (
+          <div className="py-20 text-center bg-white rounded-3xl border border-dashed border-gray-200">
+            <p className="text-gray-400">
+              No cars found. Add some to get started!
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Car Modal */}
@@ -157,6 +196,7 @@ const CarManagementSection = () => {
         initialValues={selectedCar}
         onCancel={() => setIsModalOpen(false)}
         onSubmit={handleModalSubmit}
+        loading={isAdding || isUpdating}
       />
     </div>
   );

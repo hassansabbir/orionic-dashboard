@@ -29,7 +29,10 @@ const PrivateRoute = ({ children }: PrivateRouteProps) => {
 
         const { role } = decodedToken;
 
-        if (!role || (role !== "ADMIN" && role !== "SUPER_ADMIN")) {
+        if (
+          !role ||
+          (role !== "ADMIN" && role !== "admin" && role !== "SUPER_ADMIN")
+        ) {
           toast.error("Access denied. Insufficient permissions.");
           navigate("/auth/login", { replace: true, state: { from: location } });
         }
@@ -49,7 +52,7 @@ const PrivateRoute = ({ children }: PrivateRouteProps) => {
       const decodedToken = jwtDecode<JwtPayload>(authToken);
       const { role } = decodedToken;
 
-      if (role === "ADMIN" || role === "SUPER_ADMIN") {
+      if (role === "ADMIN" || role === "admin" || role === "SUPER_ADMIN") {
         return children;
       }
     } catch {

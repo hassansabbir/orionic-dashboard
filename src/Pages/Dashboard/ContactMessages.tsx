@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Table, Dropdown, MenuProps } from "antd";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { IoEyeOutline, IoTrashOutline } from "react-icons/io5";
@@ -9,39 +9,43 @@ const mockMessages = [
   {
     id: 1,
     name: "Metro Mart",
-    message: "I am writing to inquire about the possibility of long-term rental for our corporate fleet. We require 5 luxury SUVs for our executive team for a minimum of 6 months. Please provide a detailed quote and available models.",
+    message:
+      "I am writing to inquire about the possibility of long-term rental for our corporate fleet. We require 5 luxury SUVs for our executive team for a minimum of 6 months. Please provide a detailed quote and available models.",
     phone: "+16546565656",
     email: "john@metromart.com",
     subject: "Corporate Fleet Inquiry",
-    date: "Apr 26, 2024"
+    date: "Apr 26, 2024",
   },
   {
     id: 2,
     name: "Fresh Farms LLC",
-    message: "Hello, we are interested in your exotic car collection for an upcoming brand photoshoot in Beverly Hills. Do you provide insurance coverage for commercial use during the rental period?",
+    message:
+      "Hello, we are interested in your exotic car collection for an upcoming brand photoshoot in Beverly Hills. Do you provide insurance coverage for commercial use during the rental period?",
     phone: "+16546565656",
     email: "sarah@freshfarms.com",
     subject: "Photoshoot Inquiry",
-    date: "Apr 25, 2024"
+    date: "Apr 25, 2024",
   },
   {
     id: 3,
     name: "City Grocers",
-    message: "Would it be possible to arrange a pickup from the airport? Our guest is arriving tomorrow at 3 PM and we would like to have a car ready for them. Let me know the additional charges.",
+    message:
+      "Would it be possible to arrange a pickup from the airport? Our guest is arriving tomorrow at 3 PM and we would like to have a car ready for them. Let me know the additional charges.",
     phone: "+16546565656",
     email: "mike@citygrocers.com",
     subject: "Airport Pickup Request",
-    date: "Apr 25, 2024"
+    date: "Apr 25, 2024",
   },
   {
     id: 4,
     name: "Grain Masters",
-    message: "Just wanted to say the service was excellent last weekend. The Tesla Model 3 was in pristine condition and the pickup process was very smooth. Will definitely rent from you again!",
+    message:
+      "Just wanted to say the service was excellent last weekend. The Tesla Model 3 was in pristine condition and the pickup process was very smooth. Will definitely rent from you again!",
     phone: "+16546565656",
     email: "alan@grainmasters.com",
     subject: "Feedback: Great Experience",
-    date: "Apr 24, 2024"
-  }
+    date: "Apr 24, 2024",
+  },
 ];
 
 const ContactMessages = () => {
@@ -79,12 +83,22 @@ const ContactMessages = () => {
       render: (_: any, record: any) => (
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-2 text-gray-400 group cursor-default">
-            <FiPhone size={14} className="group-hover:text-black transition-colors" />
-            <span className="text-[13px] font-medium text-[#475467]">{record.phone}</span>
+            <FiPhone
+              size={14}
+              className="group-hover:text-black transition-colors"
+            />
+            <span className="text-[13px] font-medium text-[#475467]">
+              {record.phone}
+            </span>
           </div>
           <div className="flex items-center gap-2 text-gray-400 group cursor-default">
-            <FiMail size={14} className="group-hover:text-black transition-colors" />
-            <span className="text-[13px] font-medium text-[#475467]">{record.email}</span>
+            <FiMail
+              size={14}
+              className="group-hover:text-black transition-colors"
+            />
+            <span className="text-[13px] font-medium text-[#475467]">
+              {record.email}
+            </span>
           </div>
         </div>
       ),
@@ -94,11 +108,11 @@ const ContactMessages = () => {
       key: "actions",
       align: "right" as const,
       render: (_: any, record: any) => {
-        const items: MenuProps['items'] = [
+        const items: MenuProps["items"] = [
           {
-            key: '1',
+            key: "1",
             label: (
-              <div 
+              <div
                 className="flex items-center gap-2 px-1 py-1 text-gray-600 font-medium"
                 onClick={() => handleViewDetails(record)}
               >
@@ -108,7 +122,7 @@ const ContactMessages = () => {
             ),
           },
           {
-            key: '2',
+            key: "2",
             label: (
               <div className="flex items-center gap-2 px-1 py-1 text-red-500 font-medium">
                 <IoTrashOutline size={16} />
@@ -119,7 +133,12 @@ const ContactMessages = () => {
         ];
 
         return (
-          <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight" overlayClassName="action-dropdown">
+          <Dropdown
+            menu={{ items }}
+            trigger={["click"]}
+            placement="bottomRight"
+            overlayClassName="action-dropdown"
+          >
             <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
               <HiOutlineDotsHorizontal size={20} className="text-gray-400" />
             </button>
@@ -141,10 +160,13 @@ const ContactMessages = () => {
         {/* Search Header */}
         <div className="p-6 border-b border-gray-50 flex items-center gap-3">
           <div className="relative flex-1 max-w-md">
-            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search anything..." 
+            <FiSearch
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              size={18}
+            />
+            <input
+              type="text"
+              placeholder="Search anything..."
               className="w-full pl-11 pr-4 py-3 bg-gray-50 rounded-xl text-[14px] border-none focus:ring-1 focus:ring-black outline-none transition-all placeholder:text-gray-400"
             />
           </div>
@@ -152,9 +174,9 @@ const ContactMessages = () => {
 
         {/* Table Section */}
         <div className="p-4">
-          <Table 
-            columns={columns} 
-            dataSource={mockMessages} 
+          <Table
+            columns={columns}
+            dataSource={mockMessages}
             pagination={false}
             rowKey="id"
             className="custom-table"
@@ -162,9 +184,9 @@ const ContactMessages = () => {
         </div>
       </div>
 
-      <MessageDetailsModal 
-        open={isModalOpen} 
-        onCancel={() => setIsModalOpen(false)} 
+      <MessageDetailsModal
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
         data={selectedMessage}
       />
     </div>

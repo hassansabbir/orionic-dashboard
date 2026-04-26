@@ -13,14 +13,16 @@ import ContactUs from "../Pages/Dashboard/ContactUs";
 import TeamMembers from "../Pages/Dashboard/TeamMembers";
 import ContactMessages from "../Pages/Dashboard/ContactMessages";
 import Review from "@/Pages/Dashboard/Review";
+import PrivateRoute from "./PrivateRoute";
+import Profile from "../Pages/Dashboard/Profile";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      // <PrivateRoute>
-      <Main />
-      // </PrivateRoute>
+      <PrivateRoute>
+        <Main />
+      </PrivateRoute>
     ),
     children: [
       {
@@ -38,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: "/team-members",
         element: <TeamMembers />,
+      },
+      {
+        path: "/personal-information",
+        element: <Profile />,
       },
       {
         path: "/contact-messages",

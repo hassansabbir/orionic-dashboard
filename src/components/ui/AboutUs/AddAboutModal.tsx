@@ -1,21 +1,77 @@
-import React from "react";
-import { Modal, Input, Upload } from "antd";
+import React, { useEffect, useState } from "react";
+import { Modal, Input, Upload, Form, Button } from "antd";
 import { LuUpload } from "react-icons/lu";
 import { IoCloseOutline } from "react-icons/io5";
+import type { UploadFile } from "antd/es/upload/interface";
+import getImageUrl from "@/components/ui/getImageUrl";
 
 const { TextArea } = Input;
 
 interface AddAboutModalProps {
   open: boolean;
   onCancel: () => void;
-  onSubmit: (values: any) => void;
+  onSubmit: (formData: FormData) => void;
+  mode: "add" | "edit";
+  initialValues?: any;
+  loading?: boolean;
 }
 
 const AddAboutModal: React.FC<AddAboutModalProps> = ({
   open,
   onCancel,
   onSubmit,
+  mode,
+  initialValues,
+  loading,
 }) => {
+  const [form] = Form.useForm();
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      if (mode === "edit" && initialValues) {
+        form.setFieldsValue({
+          title: initialValues.title,
+          bodyText: initialValues.bodyText,
+          icon: initialValues.icon,
+        });
+        
+        if (initialValues.image) {
+          setFileList([
+            {
+              uid: "-1",
+              name: "image",
+              status: "done",
+              url: getImageUrl(initialValues.image),
+            },
+          ]);
+        }
+      } else {
+        form.resetFields();
+        setFileList([]);
+      }
+    }
+  }, [open, mode, initialValues, form]);
+
+  const onFinish = (values: any) => {
+    const formData = new FormData();
+    const data = {
+      ...values,
+      platform: initialValues?.platform || "carRental",
+    };
+
+    formData.append("data", JSON.stringify(data));
+
+    if (fileList[0]?.originFileObj) {
+      formData.append("image", fileList[0].originFileObj);
+    }
+
+    onSubmit(formData);
+  };
+
+  const labelStyle = "block text-[12px] font-medium text-[#344054] mb-1.5";
+  const inputStyle = "h-[40px] rounded-[6px] border-[#D0D5DD] bg-white placeholder:text-[#98A2B3] text-[14px] hover:border-[#98A2B3] focus:border-[#98A2B3] focus:shadow-none transition-colors";
+
   return (
     <Modal
       title={null}
@@ -30,88 +86,68 @@ const AddAboutModal: React.FC<AddAboutModalProps> = ({
         content: {
           borderRadius: "8px",
           padding: "32px",
-          overflow: "hidden",
           boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
         },
-        body: {
-          padding: "0"
-        }
+        body: { padding: "0" }
       }}
     >
-      <div className="flex flex-col">
-        {/* Modal Title */}
+      <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false}>
         <div className="mb-6 flex justify-between items-center border-b border-gray-100 pb-4">
           <h2 className="text-[18px] font-semibold text-[#111827]">
-            Add New About
+            {mode === "add" ? "Add New About" : "Edit About Us"}
           </h2>
         </div>
 
         <div className="space-y-6">
-          {/* Icon */}
-          <div className="space-y-1.5">
-            <label className="block text-[12px] font-medium text-[#344054]">
-              Icon
-            </label>
-            <Input
-              placeholder="e.g., Tesla Model 3"
-              className="h-[40px] rounded-[6px] border-[#D0D5DD] bg-white placeholder:text-[#98A2B3] text-[14px] hover:border-[#98A2B3] focus:border-[#98A2B3] focus:shadow-none transition-colors"
-            />
-          </div>
+          <Form.Item name="icon" label={<span className={labelStyle}>Icon (e.g. FaRegBuilding)</span>} className="mb-0">
+            <Input placeholder="Icon name" className={inputStyle} />
+          </Form.Item>
 
-          {/* Business Name */}
-          <div className="space-y-1.5">
-            <label className="block text-[12px] font-medium text-[#344054]">
-              Business Name
-            </label>
-            <Input
-              placeholder="e.g., Tesla Model 3"
-              className="h-[40px] rounded-[6px] border-[#D0D5DD] bg-white placeholder:text-[#98A2B3] text-[14px] hover:border-[#98A2B3] focus:border-[#98A2B3] focus:shadow-none transition-colors"
-            />
-          </div>
+          <Form.Item name="title" label={<span className={labelStyle}>Title</span>} className="mb-0" rules={[{ required: true, message: "Required" }]}>
+            <Input placeholder="Business Name or Title" className={inputStyle} />
+          </Form.Item>
 
-          {/* Body Text */}
-          <div className="space-y-1.5">
-            <label className="block text-[12px] font-medium text-[#344054]">
-              Body Text
-            </label>
-            <TextArea
-              rows={4}
-              placeholder="Describe the review"
-              className="rounded-[6px] border-[#D0D5DD] bg-white placeholder:text-[#98A2B3] text-[14px] p-3 resize-none hover:border-[#98A2B3] focus:border-[#98A2B3] focus:shadow-none transition-colors"
-            />
-          </div>
+          <Form.Item name="bodyText" label={<span className={labelStyle}>Body Text</span>} className="mb-0" rules={[{ required: true, message: "Required" }]}>
+            <TextArea rows={6} placeholder="Describe the content" className="rounded-[6px] border-[#D0D5DD] bg-white placeholder:text-[#98A2B3] text-[14px] p-3 resize-none hover:border-[#98A2B3] focus:border-[#98A2B3] focus:shadow-none transition-colors" />
+          </Form.Item>
 
-          {/* Person Picture Upload */}
           <div className="space-y-1.5 pt-2">
-            <label className="block text-[12px] font-medium text-[#344054]">
-              Person Picture
-            </label>
-            <Upload className="w-full block" maxCount={50} multiple beforeUpload={() => false}>
-              <div className="w-full flex flex-col items-center justify-center rounded-[6px] border border-dashed border-[#D0D5DD] bg-white py-10 hover:border-[#98A2B3] hover:bg-gray-50 transition-colors cursor-pointer">
-                <LuUpload className="text-[#667085] mb-2" size={28} />
-                <p className="text-[14px] font-semibold text-[#344054]">Click to upload images</p>
-                <p className="text-[12px] text-[#98A2B3] mt-1">0 / 50 images uploaded</p>
-              </div>
+            <label className={labelStyle}>Image</label>
+            <Upload 
+              maxCount={1} 
+              listType="picture"
+              fileList={fileList}
+              onChange={({ fileList }) => setFileList(fileList)}
+              beforeUpload={() => false}
+              className="w-full block"
+            >
+              {fileList.length === 0 && (
+                <div className="w-full flex flex-col items-center justify-center rounded-[6px] border border-dashed border-[#D0D5DD] bg-white py-10 hover:border-[#98A2B3] hover:bg-gray-50 transition-colors cursor-pointer">
+                  <LuUpload className="text-[#667085] mb-2" size={28} />
+                  <p className="text-[14px] font-semibold text-[#344054]">Click to upload image</p>
+                </div>
+              )}
             </Upload>
           </div>
 
-          {/* Modal Footer Actions */}
           <div className="flex justify-end gap-3 pt-6 border-t border-gray-100 mt-8">
-            <button
+            <Button
               onClick={onCancel}
-              className="px-8 py-2.5 rounded-[6px] text-[14px] font-medium text-[#344054] bg-[#F3F4F6] hover:bg-[#E5E7EB] transition-colors"
+              className="px-8 py-2.5 h-auto rounded-[6px] text-[14px] font-medium text-[#344054] bg-[#F3F4F6] border-none hover:bg-[#E5E7EB] transition-colors shadow-none"
             >
               Cancel
-            </button>
-            <button
-              onClick={() => onSubmit({})}
-              className="px-8 py-2.5 rounded-[6px] text-[14px] font-medium text-white bg-[#111827] hover:bg-[#374151] transition-colors"
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              className="px-8 py-2.5 h-auto rounded-[6px] text-[14px] font-medium text-white bg-[#111827] border-none hover:bg-gray-900 transition-colors shadow-none"
             >
-              Add
-            </button>
+              {mode === "add" ? "Save" : "Update Changes"}
+            </Button>
           </div>
         </div>
-      </div>
+      </Form>
     </Modal>
   );
 };
