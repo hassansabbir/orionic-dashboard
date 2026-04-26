@@ -22,10 +22,10 @@ const VerifyOtp = () => {
   const location = useLocation();
   const [otp, setOtp] = useState<string>("");
   const email = new URLSearchParams(location.search).get("email");
-  
+
   // Dual timers
   const [resendTimer, setResendTimer] = useState(180); // 3 minutes for resend
-  const [totalTimer, setTotalTimer] = useState(300);   // 5 minutes for total timeout
+  const [totalTimer, setTotalTimer] = useState(300); // 5 minutes for total timeout
   const [isExpired, setIsExpired] = useState(false);
 
   const [otpVerify] = useOtpVerifyMutation();
@@ -35,7 +35,7 @@ const VerifyOtp = () => {
     const interval = setInterval(() => {
       // Resend timer countdown
       setResendTimer((prev) => (prev > 0 ? prev - 1 : 0));
-      
+
       // Total timeout countdown
       setTotalTimer((prev) => {
         if (prev <= 1) {
@@ -75,7 +75,10 @@ const VerifyOtp = () => {
       }
     } catch (error: any) {
       // Robust error message extraction
-      const errorMsg = typeof error === "string" ? error : error?.data?.message || "An error occurred";
+      const errorMsg =
+        typeof error === "string"
+          ? error
+          : error?.data?.message || "An error occurred";
       toast.error(errorMsg);
     }
   };
@@ -89,7 +92,7 @@ const VerifyOtp = () => {
       if (response?.success) {
         toast.success("OTP resent successfully");
         setResendTimer(180); // Reset resend timer
-        setTotalTimer(300);  // Reset total timeout
+        setTotalTimer(300); // Reset total timeout
         setIsExpired(false);
       } else {
         toast.error("Failed to resend OTP");

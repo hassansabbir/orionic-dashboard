@@ -25,13 +25,6 @@ interface ChangePasswordData {
   confirm_password: string;
 }
 
-interface UpdateProfileData {
-  name: string;
-  email: string;
-  address: string;
-  phone: string;
-}
-
 const authSlice = api.injectEndpoints({
   endpoints: (builder) => ({
     otpVerify: builder.mutation<any, OtpVerifyData>({
@@ -69,7 +62,10 @@ const authSlice = api.injectEndpoints({
         };
       },
     }),
-    resetPassword: builder.mutation<any, { token: string; data: ResetPasswordData }>({
+    resetPassword: builder.mutation<
+      any,
+      { token: string; data: ResetPasswordData }
+    >({
       query: ({ token, data }) => {
         return {
           method: "POST",
