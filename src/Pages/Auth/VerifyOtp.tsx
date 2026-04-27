@@ -71,7 +71,7 @@ const VerifyOtp = () => {
         toast.success(response.message || "OTP verified successfully");
         navigate(`/auth/reset-password?token=${token}`);
       } else {
-        toast.error(response?.message || "OTP verification failed");
+        toast.error(response?.message || "OTP verification failed!");
       }
     } catch (error: any) {
       // Robust error message extraction
