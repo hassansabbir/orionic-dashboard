@@ -1,9 +1,6 @@
-import { FaRegBell } from "react-icons/fa6";
-import { Badge } from "antd";
 import { Link } from "react-router-dom";
 import { useProfileQuery } from "../../redux/apiSlices/authSlice";
 import Breadcrumbs from "../../components/Breadcrumbs";
-import SearchBar from "../../components/SearchBar";
 import getImageUrl from "@/components/ui/getImageUrl";
 
 const Header = () => {
