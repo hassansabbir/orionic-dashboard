@@ -1,6 +1,7 @@
 import React from "react";
 import { Modal } from "antd";
 import { IoCloseOutline } from "react-icons/io5";
+import dayjs from "dayjs";
 
 interface MessageDetailsModalProps {
   open: boolean;
@@ -23,18 +24,24 @@ const MessageDetailsModal: React.FC<MessageDetailsModalProps> = ({
       footer={null}
       width={700}
       centered
-      closeIcon={<IoCloseOutline size={22} className="text-gray-500 hover:text-black transition-colors" />}
+      closeIcon={
+        <IoCloseOutline
+          size={22}
+          className="text-gray-500 hover:text-black transition-colors"
+        />
+      }
       className="car-modal"
       styles={{
         content: {
           borderRadius: "8px",
           padding: "32px",
           overflow: "hidden",
-          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+          boxShadow:
+            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
         },
         body: {
-          padding: "0"
-        }
+          padding: "0",
+        },
       }}
     >
       <div className="flex flex-col">
@@ -48,33 +55,47 @@ const MessageDetailsModal: React.FC<MessageDetailsModalProps> = ({
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-1">
-              <p className="text-[12px] font-medium text-gray-400 uppercase tracking-wider">User Name</p>
-              <p className="text-[15px] font-semibold text-[#111827]">{data.name}</p>
+              <p className="text-[12px] font-medium text-gray-400 uppercase tracking-wider">
+                User Name
+              </p>
+              <p className="text-[15px] font-semibold text-[#111827]">
+                {data.name}
+              </p>
             </div>
             <div className="space-y-1 text-right">
-              <p className="text-[12px] font-medium text-gray-400 uppercase tracking-wider">Date</p>
-              <p className="text-[15px] font-medium text-[#344054]">{data.date || "Apr 26, 2024"}</p>
+              <p className="text-[12px] font-medium text-gray-400 uppercase tracking-wider">
+                Date
+              </p>
+              <p className="text-[15px] font-medium text-[#344054]">
+                {data.createdAt
+                  ? dayjs(data.createdAt).format("MMM DD, YYYY")
+                  : "N/A"}
+              </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-1">
-              <p className="text-[12px] font-medium text-gray-400 uppercase tracking-wider">Email Address</p>
-              <p className="text-[15px] font-medium text-[#344054]">{data.email}</p>
-            </div>
-            <div className="space-y-1 text-right">
-              <p className="text-[12px] font-medium text-gray-400 uppercase tracking-wider">Phone Number</p>
-              <p className="text-[15px] font-medium text-[#344054]">{data.phone}</p>
-            </div>
+          <div className="space-y-1">
+            <p className="text-[12px] font-medium text-gray-400 uppercase tracking-wider">
+              Email Address
+            </p>
+            <p className="text-[15px] font-medium text-[#344054]">
+              {data.email}
+            </p>
           </div>
 
-          <div className="space-y-1 pt-2 border-t border-gray-50 mt-2">
-            <p className="text-[12px] font-medium text-gray-400 uppercase tracking-wider">Subject</p>
-            <p className="text-[16px] font-bold italic text-[#111827]">{data.subject || "No Subject"}</p>
+          <div className="space-y-1">
+            <p className="text-[12px] font-medium text-gray-400 uppercase tracking-wider">
+              Phone Number
+            </p>
+            <p className="text-[15px] font-medium text-[#344054]">
+              {data.phone}
+            </p>
           </div>
 
           <div className="space-y-2 pt-2">
-            <p className="text-[12px] font-medium text-gray-400 uppercase tracking-wider">Message</p>
+            <p className="text-[12px] font-medium text-gray-400 uppercase tracking-wider">
+              Message
+            </p>
             <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
               <p className="text-[15px] text-[#475467] leading-relaxed whitespace-pre-wrap italic">
                 "{data.message}"

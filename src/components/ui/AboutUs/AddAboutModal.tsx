@@ -26,6 +26,7 @@ const AddAboutModal: React.FC<AddAboutModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [iconFileList, setIconFileList] = useState<UploadFile[]>([]);
 
   useEffect(() => {
     if (open) {
@@ -33,9 +34,8 @@ const AddAboutModal: React.FC<AddAboutModalProps> = ({
         form.setFieldsValue({
           title: initialValues.title,
           bodyText: initialValues.bodyText,
-          icon: initialValues.icon,
         });
-        
+
         if (initialValues.image) {
           setFileList([
             {
@@ -46,9 +46,21 @@ const AddAboutModal: React.FC<AddAboutModalProps> = ({
             },
           ]);
         }
+
+        if (initialValues.icon) {
+          setIconFileList([
+            {
+              uid: "-2",
+              name: "icon",
+              status: "done",
+              url: getImageUrl(initialValues.icon),
+            },
+          ]);
+        }
       } else {
         form.resetFields();
         setFileList([]);
+        setIconFileList([]);
       }
     }
   }, [open, mode, initialValues, form]);
@@ -64,6 +76,10 @@ const AddAboutModal: React.FC<AddAboutModalProps> = ({
 
     if (fileList[0]?.originFileObj) {
       formData.append("image", fileList[0].originFileObj);
+    }
+
+    if (iconFileList[0]?.originFileObj) {
+      formData.append("icon", iconFileList[0].originFileObj);
     }
 
     onSubmit(formData);
@@ -99,9 +115,24 @@ const AddAboutModal: React.FC<AddAboutModalProps> = ({
         </div>
 
         <div className="space-y-6">
-          <Form.Item name="icon" label={<span className={labelStyle}>Icon (e.g. FaRegBuilding)</span>} className="mb-0">
-            <Input placeholder="Icon name" className={inputStyle} />
-          </Form.Item>
+          <div className="space-y-1.5 pt-2">
+            <label className={labelStyle}>Icon</label>
+            <Upload 
+              maxCount={1} 
+              listType="picture"
+              fileList={iconFileList}
+              onChange={({ fileList }) => setIconFileList(fileList)}
+              beforeUpload={() => false}
+              className="w-full block"
+            >
+              {iconFileList.length === 0 && (
+                <div className="w-full flex flex-col items-center justify-center rounded-[6px] border border-dashed border-[#D0D5DD] bg-white py-10 hover:border-[#98A2B3] hover:bg-gray-50 transition-colors cursor-pointer">
+                  <LuUpload className="text-[#667085] mb-2" size={28} />
+                  <p className="text-[14px] font-semibold text-[#344054]">Click to upload icon</p>
+                </div>
+              )}
+            </Upload>
+          </div>
 
           <Form.Item name="title" label={<span className={labelStyle}>Title</span>} className="mb-0" rules={[{ required: true, message: "Required" }]}>
             <Input placeholder="Business Name or Title" className={inputStyle} />

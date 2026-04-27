@@ -18,8 +18,27 @@ export const contactApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Contact"],
     }),
+    getContactMessages: builder.query<any, { platform: string; page?: number; limit?: number }>({
+      query: ({ platform, page = 1, limit = 10 }) => ({
+        url: "/contact",
+        params: { platform, page, limit },
+      }),
+      providesTags: ["Contact"],
+    }),
+
+    deleteContactMessage: builder.mutation<any, string>({
+      query: (id) => ({
+        url: `/contact/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Contact"],
+    }),
   }),
 });
 
-export const { useGetContactInfoQuery, useUpdateContactInfoMutation } =
-  contactApi;
+export const {
+  useGetContactInfoQuery,
+  useUpdateContactInfoMutation,
+  useGetContactMessagesQuery,
+  useDeleteContactMessageMutation,
+} = contactApi;

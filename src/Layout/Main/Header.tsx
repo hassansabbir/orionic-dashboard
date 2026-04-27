@@ -21,20 +21,20 @@ const Header = () => {
       </div>
 
       {/* Middle: Search Bar */}
-      <div className="flex-[1.5] flex justify-center">
+      {/* <div className="flex-[1.5] flex justify-center">
         <SearchBar />
-      </div>
+      </div> */}
 
       {/* Right side: Notifications and User Profile */}
       <div className="flex-1 flex items-center justify-end gap-6">
         {/* Notification Bell */}
-        <div className="relative">
+        {/* <div className="relative">
           <button className="p-2.5 bg-white rounded-xl text-gray-400 hover:text-black transition-colors shadow-sm border border-gray-50">
             <Badge dot color="#ef4444">
               <FaRegBell size={20} />
             </Badge>
           </button>
-        </div>
+        </div> */}
 
         {/* User Profile */}
         <Link

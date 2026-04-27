@@ -1,61 +1,50 @@
 import { useState } from "react";
-import { Table, Dropdown, MenuProps } from "antd";
+import { Table, Dropdown, MenuProps, Popconfirm } from "antd";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { IoEyeOutline, IoTrashOutline } from "react-icons/io5";
-import { FiPhone, FiMail, FiSearch } from "react-icons/fi";
+import { FiMail, FiPhone, FiSearch } from "react-icons/fi";
 import MessageDetailsModal from "../../components/ui/ContactMessages/MessageDetailsModal";
-
-const mockMessages = [
-  {
-    id: 1,
-    name: "Metro Mart",
-    message:
-      "I am writing to inquire about the possibility of long-term rental for our corporate fleet. We require 5 luxury SUVs for our executive team for a minimum of 6 months. Please provide a detailed quote and available models.",
-    phone: "+16546565656",
-    email: "john@metromart.com",
-    subject: "Corporate Fleet Inquiry",
-    date: "Apr 26, 2024",
-  },
-  {
-    id: 2,
-    name: "Fresh Farms LLC",
-    message:
-      "Hello, we are interested in your exotic car collection for an upcoming brand photoshoot in Beverly Hills. Do you provide insurance coverage for commercial use during the rental period?",
-    phone: "+16546565656",
-    email: "sarah@freshfarms.com",
-    subject: "Photoshoot Inquiry",
-    date: "Apr 25, 2024",
-  },
-  {
-    id: 3,
-    name: "City Grocers",
-    message:
-      "Would it be possible to arrange a pickup from the airport? Our guest is arriving tomorrow at 3 PM and we would like to have a car ready for them. Let me know the additional charges.",
-    phone: "+16546565656",
-    email: "mike@citygrocers.com",
-    subject: "Airport Pickup Request",
-    date: "Apr 25, 2024",
-  },
-  {
-    id: 4,
-    name: "Grain Masters",
-    message:
-      "Just wanted to say the service was excellent last weekend. The Tesla Model 3 was in pristine condition and the pickup process was very smooth. Will definitely rent from you again!",
-    phone: "+16546565656",
-    email: "alan@grainmasters.com",
-    subject: "Feedback: Great Experience",
-    date: "Apr 24, 2024",
-  },
-];
+import {
+  useGetContactMessagesQuery,
+  useDeleteContactMessageMutation,
+} from "@/redux/apiSlices/contactSlice";
+import dayjs from "dayjs";
+import toast from "react-hot-toast";
 
 const ContactMessages = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { data: messagesData, isLoading } = useGetContactMessagesQuery({
+    platform: "parent",
+    page: currentPage,
+    limit: 10,
+  });
+  const [deleteMessage] = useDeleteContactMessageMutation();
 
   const handleViewDetails = (record: any) => {
     setSelectedMessage(record);
     setIsModalOpen(true);
   };
+
+  const handleDeleteMessage = async (id: string) => {
+    try {
+      await deleteMessage(id).unwrap();
+      toast.success("Message deleted successfully");
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to delete message");
+    }
+  };
+
+  const filteredMessages = messagesData?.data?.filter(
+    (msg: any) =>
+      msg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      msg.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      msg.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      msg.phone?.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   const columns = [
     {
@@ -70,7 +59,7 @@ const ContactMessages = () => {
       title: "MESSAGES",
       dataIndex: "message",
       key: "message",
-      width: "35%",
+      width: "40%",
       render: (text: string) => (
         <span className="text-[14px] font-medium text-[#475467] line-clamp-1 italic">
           {text}
@@ -78,29 +67,42 @@ const ContactMessages = () => {
       ),
     },
     {
-      title: "CONTACT",
-      key: "contact",
-      render: (_: any, record: any) => (
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-2 text-gray-400 group cursor-default">
-            <FiPhone
-              size={14}
-              className="group-hover:text-black transition-colors"
-            />
-            <span className="text-[13px] font-medium text-[#475467]">
-              {record.phone}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-400 group cursor-default">
+      title: "CONTACT INFO",
+      dataIndex: "email",
+      key: "email",
+      render: (text: string, record: any) => (
+        <div className="flex flex-col items-start gap-2 text-gray-400 group cursor-default">
+          <div className="flex items-center gap-2">
             <FiMail
               size={14}
               className="group-hover:text-black transition-colors"
             />
             <span className="text-[13px] font-medium text-[#475467]">
-              {record.email}
+              {text}
             </span>
           </div>
+          {record?.phone && (
+            <div className="flex items-center gap-2">
+              <FiPhone
+                size={14}
+                className="group-hover:text-black transition-colors"
+              />
+              <span className="text-[13px] font-medium text-[#475467]">
+                {record?.phone}
+              </span>
+            </div>
+          )}
         </div>
+      ),
+    },
+    {
+      title: "DATE",
+      dataIndex: "createdAt",
+      key: "date",
+      render: (date: string) => (
+        <span className="text-[13px] font-medium text-[#475467]">
+          {dayjs(date).format("MMM DD, YYYY")}
+        </span>
       ),
     },
     {
@@ -124,10 +126,18 @@ const ContactMessages = () => {
           {
             key: "2",
             label: (
-              <div className="flex items-center gap-2 px-1 py-1 text-red-500 font-medium">
-                <IoTrashOutline size={16} />
-                <span>Remove Message</span>
-              </div>
+              <Popconfirm
+                title="Delete this message?"
+                onConfirm={() => handleDeleteMessage(record._id)}
+                okText="Yes"
+                cancelText="No"
+                okButtonProps={{ className: "bg-black" }}
+              >
+                <div className="flex items-center gap-2 px-1 py-1 text-red-500 font-medium">
+                  <IoTrashOutline size={16} />
+                  <span>Remove Message</span>
+                </div>
+              </Popconfirm>
             ),
           },
         ];
@@ -152,7 +162,9 @@ const ContactMessages = () => {
     <div className="p-8 h-full flex flex-col bg-[#F9FAFB]">
       {/* Page Title */}
       <div className="mb-8">
-        <h1 className="text-2xl font-medium text-[#111827]">Contact Us</h1>
+        <h1 className="text-2xl font-medium text-[#111827]">
+          Contact Messages (Parent Web)
+        </h1>
       </div>
 
       {/* Main Container */}
@@ -166,7 +178,12 @@ const ContactMessages = () => {
             />
             <input
               type="text"
-              placeholder="Search anything..."
+              placeholder="Search by name, email or message..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1); // Reset to page 1 on search
+              }}
               className="w-full pl-11 pr-4 py-3 bg-gray-50 rounded-xl text-[14px] border-none focus:ring-1 focus:ring-black outline-none transition-all placeholder:text-gray-400"
             />
           </div>
@@ -176,9 +193,16 @@ const ContactMessages = () => {
         <div className="p-4">
           <Table
             columns={columns}
-            dataSource={mockMessages}
-            pagination={false}
-            rowKey="id"
+            dataSource={filteredMessages}
+            loading={isLoading}
+            pagination={{
+              current: currentPage,
+              pageSize: 10,
+              total: messagesData?.meta?.total || 0,
+              onChange: (page) => setCurrentPage(page),
+              showSizeChanger: false,
+            }}
+            rowKey="_id"
             className="custom-table"
           />
         </div>
