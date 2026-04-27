@@ -173,15 +173,6 @@ const AboutUs = () => {
                   <div className="flex flex-col justify-center py-4">
                     {activeTab === "carRental" && (
                       <>
-                        {about.icon && (
-                          <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mb-6 shadow-sm border border-gray-100">
-                            <img
-                              src={getImageUrl(about.icon)}
-                              alt="icon"
-                              className="w-full h-full object-contain p-2.5"
-                            />
-                          </div>
-                        )}
                         <p className="text-[12px] font-bold text-[#FACC15] tracking-[0.2em] uppercase mb-3">
                           HERITAGE
                         </p>
@@ -214,6 +205,7 @@ const AboutUs = () => {
         open={isModalOpen}
         mode={modalMode}
         initialValues={selectedAbout}
+        platform={activeTab}
         onCancel={() => setIsModalOpen(false)}
         onSubmit={handleModalSubmit}
         loading={isAdding || isUpdating}

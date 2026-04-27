@@ -14,6 +14,7 @@ interface AddAboutModalProps {
   mode: "add" | "edit";
   initialValues?: any;
   loading?: boolean;
+  platform: "carRental" | "parent";
 }
 
 const AddAboutModal: React.FC<AddAboutModalProps> = ({
@@ -23,6 +24,7 @@ const AddAboutModal: React.FC<AddAboutModalProps> = ({
   mode,
   initialValues,
   loading,
+  platform,
 }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -69,7 +71,7 @@ const AddAboutModal: React.FC<AddAboutModalProps> = ({
     const formData = new FormData();
     const data = {
       ...values,
-      platform: initialValues?.platform || "carRental",
+      platform: platform,
     };
 
     formData.append("data", JSON.stringify(data));
@@ -78,7 +80,7 @@ const AddAboutModal: React.FC<AddAboutModalProps> = ({
       formData.append("image", fileList[0].originFileObj);
     }
 
-    if (iconFileList[0]?.originFileObj) {
+    if (iconFileList[0]?.originFileObj && platform === "parent") {
       formData.append("icon", iconFileList[0].originFileObj);
     }
 
@@ -115,31 +117,47 @@ const AddAboutModal: React.FC<AddAboutModalProps> = ({
         </div>
 
         <div className="space-y-6">
-          <div className="space-y-1.5 pt-2">
-            <label className={labelStyle}>Icon</label>
-            <Upload 
-              maxCount={1} 
-              listType="picture"
-              fileList={iconFileList}
-              onChange={({ fileList }) => setIconFileList(fileList)}
-              beforeUpload={() => false}
-              className="w-full block"
-            >
-              {iconFileList.length === 0 && (
-                <div className="w-full flex flex-col items-center justify-center rounded-[6px] border border-dashed border-[#D0D5DD] bg-white py-10 hover:border-[#98A2B3] hover:bg-gray-50 transition-colors cursor-pointer">
-                  <LuUpload className="text-[#667085] mb-2" size={28} />
-                  <p className="text-[14px] font-semibold text-[#344054]">Click to upload icon</p>
-                </div>
-              )}
-            </Upload>
-          </div>
+          {platform === "parent" && (
+            <div className="space-y-1.5 pt-2">
+              <label className={labelStyle}>Icon</label>
+              <Upload 
+                maxCount={1} 
+                listType="picture"
+                fileList={iconFileList}
+                onChange={({ fileList }) => setIconFileList(fileList)}
+                beforeUpload={() => false}
+                className="w-full block"
+              >
+                {iconFileList.length === 0 && (
+                  <div className="w-full flex flex-col items-center justify-center rounded-[6px] border border-dashed border-[#D0D5DD] bg-white py-10 hover:border-[#98A2B3] hover:bg-gray-50 transition-colors cursor-pointer">
+                    <LuUpload className="text-[#667085] mb-2" size={28} />
+                    <p className="text-[14px] font-semibold text-[#344054]">Click to upload icon</p>
+                  </div>
+                )}
+              </Upload>
+            </div>
+          )}
 
           <Form.Item name="title" label={<span className={labelStyle}>Title</span>} className="mb-0" rules={[{ required: true, message: "Required" }]}>
             <Input placeholder="Business Name or Title" className={inputStyle} />
           </Form.Item>
 
-          <Form.Item name="bodyText" label={<span className={labelStyle}>Body Text</span>} className="mb-0" rules={[{ required: true, message: "Required" }]}>
-            <TextArea rows={6} placeholder="Describe the content" className="rounded-[6px] border-[#D0D5DD] bg-white placeholder:text-[#98A2B3] text-[14px] p-3 resize-none hover:border-[#98A2B3] focus:border-[#98A2B3] focus:shadow-none transition-colors" />
+          <Form.Item 
+            name="bodyText" 
+            label={<span className={labelStyle}>Body Text</span>} 
+            className="mb-0" 
+            rules={[
+              { required: true, message: "Required" },
+              { max: 770, message: "Maximum 770 characters allowed" }
+            ]}
+          >
+            <TextArea 
+              rows={6} 
+              maxLength={770}
+              showCount
+              placeholder="Describe the content" 
+              className="rounded-[6px] border-[#D0D5DD] bg-white placeholder:text-[#98A2B3] text-[14px] p-3 resize-none hover:border-[#98A2B3] focus:border-[#98A2B3] focus:shadow-none transition-colors" 
+            />
           </Form.Item>
 
           <div className="space-y-1.5 pt-2">
