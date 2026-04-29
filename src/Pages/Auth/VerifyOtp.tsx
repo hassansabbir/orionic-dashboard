@@ -25,7 +25,7 @@ const VerifyOtp = () => {
 
   // Dual timers
   const [resendTimer, setResendTimer] = useState(180); // 3 minutes for resend
-  const [totalTimer, setTotalTimer] = useState(300); // 5 minutes for total timeout
+  const [_, setTotalTimer] = useState(300); // 5 minutes for total timeout
   const [isExpired, setIsExpired] = useState(false);
 
   const [otpVerify] = useOtpVerifyMutation();

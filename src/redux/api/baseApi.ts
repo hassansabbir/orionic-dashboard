@@ -13,7 +13,8 @@ const baseQueryWithReauth: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
   const baseQuery = fetchBaseQuery({
-    baseUrl: "http://10.10.7.94:5004/api/v1",
+    // baseUrl: "http://10.10.7.94:5004/api/v1",
+    baseUrl: "https://fahim5004.naimulhassan.me",
     prepareHeaders: (headers) => {
       const token =
         localStorage.getItem("authToken") ||
@@ -84,8 +85,17 @@ const baseQueryWithReauth: BaseQueryFn<
 export const api = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Banner", "AdminData", "Cars", "Reviews", "AboutUs", "Contact", "Members", "FAQ"],
+  tagTypes: [
+    "Banner",
+    "AdminData",
+    "Cars",
+    "Reviews",
+    "AboutUs",
+    "Contact",
+    "Members",
+    "FAQ",
+  ],
   endpoints: () => ({}),
 });
 
-export const imageUrl = "http://10.10.7.94:5004";
+export const imageUrl = "https://fahim5004.naimulhassan.me";
