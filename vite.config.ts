@@ -13,17 +13,29 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ["react", "react-dom", "react-router-dom", "react-redux", "@reduxjs/toolkit"],
+          vendor: [
+            "react",
+            "react-dom",
+            "react-router-dom",
+            "react-redux",
+            "@reduxjs/toolkit",
+          ],
           ui: ["antd", "react-icons"],
           chart: ["recharts"],
-          editor: ["jodit-react"]
+          editor: ["jodit-react"],
         },
       },
     },
     chunkSizeWarningLimit: 1000,
   },
   server: {
-    // host: "192.168.10.20",
-    // port: 3003,
+    host: "10.10.7.47",
+    port: 3001,
+    // @ts-ignore
+    allowedHosts: ["dashboard.oriencoinc.com"],
+  },
+  preview: {
+    // @ts-ignore
+    allowedHosts: ["dashboard.oriencoinc.com"],
   },
 });

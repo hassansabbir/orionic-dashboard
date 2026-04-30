@@ -14,7 +14,8 @@ const baseQueryWithReauth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   const baseQuery = fetchBaseQuery({
     // baseUrl: "http://10.10.7.94:5004/api/v1",
-    baseUrl: "https://fahim5004.naimulhassan.me",
+    // baseUrl: "https://fahim5004.naimulhassan.me/api/v1",
+    baseUrl: "https://api.oriencoinc.com/api/v1",
     prepareHeaders: (headers) => {
       const token =
         localStorage.getItem("authToken") ||
@@ -98,4 +99,4 @@ export const api = createApi({
   endpoints: () => ({}),
 });
 
-export const imageUrl = "https://fahim5004.naimulhassan.me";
+export const imageUrl = "https://api.oriencoinc.com";
